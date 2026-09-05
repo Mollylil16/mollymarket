@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useCaisseStore } from '../../store/useCaisseStore';
 import { UserRole } from '../../types';
 import { Menu, LogOut, Shield, ChevronDown, Lock, Unlock, Clock } from 'lucide-react';
+import { NotificationBell } from './NotificationBell';
 
 interface HeaderProps {
   onOpenMobileMenu: () => void;
@@ -44,6 +45,9 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMobileMenu, title }) => {
       </div>
 
       <div className="flex items-center gap-2 sm:gap-3">
+        {/* Centre de Notifications */}
+        <NotificationBell />
+
         {/* Badge d'état global du cycle de vie de la session de caisse */}
         <Link
           to="/point-de-caisse"
