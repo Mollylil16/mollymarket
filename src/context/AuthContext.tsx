@@ -47,10 +47,17 @@ const ROLE_PERMISSIONS: Record<UserRole, AppFeature[]> = {
   ],
   Directeur: [
     'dashboard',
+    'statistiques',
     'point_de_caisse',
     'achats',
     'paiements',
-    'statistiques'
+    'stocks',
+    'produits',
+    'categories',
+    'fournisseurs',
+    'clients',
+    'ventes',
+    'employes'
   ],
   Vendeur: [
     'clients',
