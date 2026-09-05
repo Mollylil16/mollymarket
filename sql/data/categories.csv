@@ -1,0 +1,17 @@
+id,code,nom,description
+1,CAT-EPICERIE-SALEE,Épicerie salée,Riz de qualité supérieure huiles raffinées pâtes alimentaires
+2,CAT-EPICERIE-SUCREE,Épicerie sucrée,Sucres confitures chocolats biscuits miels céréales
+3,CAT-BOISSONS,Boissons,Eaux minérales sodas jus de fruits bières locales cafés et thés
+4,CAT-LAITIERS-OEUFS,Produits laitiers & œufs,Laits en poudre beurres pasteurisés fromages yaourts œufs frais
+5,CAT-BOUCHERIE-VOLAILLE,Boucherie & volaille,Poulets entiers steaks charcuteries viandes fraîches
+6,CAT-POISSONNERIE,Poissonnerie,Tilapias maquereaux capitaines poissons fumés crevettes
+7,CAT-FRUITS-LEGUMES,Fruits et légumes,Fruits tropicaux agrumes et légumes frais de Côte d Ivoire
+8,CAT-SURGELES,Surgelés,Poissons panés frites glaces légumes surgelés
+9,CAT-BOULANGERIE-PATISSERIE,Boulangerie & pâtisserie,Baguettes fraîches pains de mie brioches gâteaux
+10,CAT-HYGIENE-BEAUTE,Hygiène & beauté,Savons de beauté gels douche soins dentaires et capillaires
+11,CAT-ENTRETIEN-DROGUERIE,Entretien & droguerie,Savons de ménage détergents javel assouplissants
+12,CAT-BEBE-PUERICULTURE,Bébé & puériculture,Couches culottes laits infantiles lingettes
+13,CAT-BAZAR-MAISON,Bazar & maison,Vaisselle durable couverts bougies rangements
+14,CAT-TEXTILE-ACCESSOIRES,Textile & accessoires,Serviettes cotons pagnes et accessoires
+15,CAT-HIGH-TECH-BUREAU,High-Tech & bureautique,Piles torches câbles chargeurs fournitures
+16,CAT-ANIMAUX-JARDIN,Animaux & jardin,Aliments volailles croquettes produits d entretien jardin

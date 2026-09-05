@@ -1,0 +1,4 @@
+id,code_fournisseur,nom_entreprise,contact_nom,telephone,email,adresse,ville,actif
+1,FRS-0001,SIPRA Côte d Ivoire,Koffi Germain,07 20 22 45 67,commandes@sipra.ci,Zone Industrielle de Yopougon,Abidjan,true
+2,FRS-0002,SANIA Cie (Huiles & Margarines),Kacou Daniel,05 21 75 88 90,contact@sania.ci,Boulevard de Vridi Port Autonome,Abidjan,true
+3,FRS-0003,Carré d Or Distribution CI,Ibrahim Fakhry,01 21 35 12 34,commercial@carredor.ci,Zone Industrielle de Koumassi,Abidjan,true

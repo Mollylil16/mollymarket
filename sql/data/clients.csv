@@ -1,0 +1,9 @@
+id,code_client,nom,prenom,telephone,email,adresse,actif
+1,CLI-0001,Kouamé,Affoué,07 08 12 34 56,affoue.kouame@gmail.ci,Cocody Angré 8ème Tranche Abidjan,true
+2,CLI-0002,Konan,Jean-Yves,05 44 55 66 77,jean-yves.konan@yahoo.fr,Marcory Zone 4 Rue du Canal Abidjan,true
+3,CLI-0003,Bamba,Mariam,01 02 03 04 05,mariam.bamba@outlook.ci,Plateau Avenue Chardy Abidjan,true
+4,CLI-0004,Yao,Serge,07 77 88 99 00,serge.yao@gmail.com,Yopougon Selmer Carrefour Bel Air Abidjan,true
+5,CLI-0005,Traoré,Fatou,05 11 22 33 44,fatou.traore@hotmail.com,Treichville Avenue 8 Rue 12 Abidjan,true
+6,CLI-0006,Soro,Drissa,07 23 45 67 89,drissa.soro@gmail.ci,Koumassi Remblais Boulevard du Gabon Abidjan,true
+7,CLI-0007,Diabaté,Aminata,01 98 76 54 32,aminata.diabate@yahoo.ci,Riviera Palmeraie Rosiers Abidjan,true
+8,CLI-0008,N Guessan,Thierry,05 87 65 43 21,thierry.nguessan@gmail.com,Deux-Plateaux Vallons Rue des Jardins Abidjan,true
