@@ -471,12 +471,21 @@ function generatePDF() {
   const publicPath = path.resolve(__dirname, '../../public/MollyMarket_Dossier_Technique_et_Guide_Soutenance.pdf');
 
   const pdfBytes = doc.output('arraybuffer');
-  fs.writeFileSync(rootPath, Buffer.from(pdfBytes));
-  fs.writeFileSync(publicPath, Buffer.from(pdfBytes));
+  try {
+    fs.writeFileSync(rootPath, Buffer.from(pdfBytes));
+    console.log(`   - ${rootPath}`);
+  } catch (e) {
+    console.warn(`⚠️ Impossible d'écraser ${rootPath} (fichier ouvert dans un lecteur PDF)`);
+  }
 
-  console.log(`✅ Dossier PDF généré avec succès dans :`);
-  console.log(`   - ${rootPath}`);
-  console.log(`   - ${publicPath}`);
+  try {
+    fs.writeFileSync(publicPath, Buffer.from(pdfBytes));
+    console.log(`   - ${publicPath}`);
+  } catch (e) {
+    console.warn(`⚠️ Impossible d'écraser ${publicPath} (fichier ouvert dans un lecteur PDF)`);
+  }
+
+  console.log(`✅ Dossier PDF généré avec succès.`);
 }
 
 generatePDF();
