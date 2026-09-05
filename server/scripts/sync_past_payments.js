@@ -14,7 +14,7 @@ async function run() {
           "INSERT INTO mouvements_caisse (sens, type, montant, motif, justificatif, effectue_par_id, solde_apres) VALUES ('sortie', 'paiement_fournisseur', $1, 'Règlement Facture Fournisseur ' || $2, $3, 2, $4)",
           [montant, a.nom_entreprise, a.numero_achat, soldeApres]
         );
-        console.log('✅ Sortie de caisse enregistrée pour le bon', a.numero_achat, ':', montant, 'FCFA');
+        console.log(' Sortie de caisse enregistrée pour le bon', a.numero_achat, ':', montant, 'FCFA');
       }
     }
     process.exit(0);
