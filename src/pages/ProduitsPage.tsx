@@ -7,7 +7,7 @@ import { Modal } from '../components/ui/Modal';
 import { FormField } from '../components/ui/FormField';
 import { useToast } from '../context/ToastContext';
 import { formatFCFA } from '../utils/format';
-import { Package, Plus, Edit2, Barcode, AlertTriangle, Filter } from 'lucide-react';
+import { Package, Plus, Edit2, Barcode, Filter } from 'lucide-react';
 
 export const ProduitsPage: React.FC = () => {
   const [produits, setProduits] = useState<Produit[]>([]);
@@ -70,11 +70,11 @@ export const ProduitsPage: React.FC = () => {
     setEditingProduit(null);
     setFormErrors({});
     setFormData({
-      code_barre: `32503900${Math.floor(10000 + Math.random() * 90000)}`,
+      code_barre: `61811005${Math.floor(10000 + Math.random() * 90000)}`,
       nom: '',
       categorie_id: categories.length > 0 ? categories[0].id : 1,
-      prix_vente: 1.0,
-      prix_achat: 0.6,
+      prix_vente: 1500,
+      prix_achat: 1000,
       seuil_alerte: 10,
       unite_mesure: 'unité',
       stock_initial: 20
@@ -86,25 +86,24 @@ export const ProduitsPage: React.FC = () => {
     setEditingProduit(p);
     setFormErrors({});
     setFormData({
-      code_barre: p.code_barre,
+      code_barre: p.code_barre || '',
       nom: p.nom,
-      categorie_id: p.categorie_id,
-      prix_vente: p.prix_vente,
-      prix_achat: p.prix_achat,
-      seuil_alerte: p.seuil_alerte,
-      unite_mesure: p.unite_mesure,
-      stock_initial: p.stock_actuel
+      categorie_id: p.categorie_id || (categories.length > 0 ? categories[0].id : 1),
+      prix_vente: Number(p.prix_vente) || 0,
+      prix_achat: Number(p.prix_achat) || 0,
+      seuil_alerte: p.seuil_alerte || 10,
+      unite_mesure: p.unite_mesure || 'unité',
+      stock_initial: p.stock_actuel || 0
     });
     setModalOpen(true);
   };
 
   const handlePriceChange = (field: 'prix_vente' | 'prix_achat', rawVal: string) => {
     const val = parseFloat(rawVal) || 0;
-    // Contrôle visuel strict pour empêcher un prix négatif
     if (val < 0) {
       setFormErrors((prev) => ({
         ...prev,
-        [field]: 'Le prix ne peut pas être strictement négatif (contrainte PostgreSQL).'
+        [field]: 'Le prix doit être supérieur ou égal à 0.'
       }));
     } else {
       setFormErrors((prev) => {
@@ -119,7 +118,6 @@ export const ProduitsPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Vérification visuelle
     if (formData.prix_vente < 0 || formData.prix_achat < 0) {
       toastError('Le prix de vente ou le prix d\'achat ne peut pas être négatif.');
       return;
@@ -141,10 +139,10 @@ export const ProduitsPage: React.FC = () => {
           seuil_alerte: formData.seuil_alerte,
           unite_mesure: formData.unite_mesure
         });
-        toastSuccess('Produit mis à jour', 'CALL sp_modifier_produit');
+        toastSuccess('Fiche produit mise à jour avec succès');
       } else {
         await apiClient.ajouterProduit(formData);
-        toastSuccess('Produit référencé en rayon', 'CALL sp_ajouter_produit');
+        toastSuccess('Nouveau produit référencé dans le catalogue');
       }
       setModalOpen(false);
       loadData();
@@ -188,9 +186,9 @@ export const ProduitsPage: React.FC = () => {
     },
     {
       key: 'prix_achat',
-      header: 'Prix Achat',
+      header: 'Prix Achat / PUMP',
       align: 'right',
-      width: '120px',
+      width: '140px',
       accessor: (p) => (
         <span className="text-neutral-500">{formatFCFA(p.prix_achat)}</span>
       )
@@ -217,17 +215,17 @@ export const ProduitsPage: React.FC = () => {
       align: 'center',
       width: '130px',
       accessor: (p) => {
-        const labels = {
+        const labels: Record<string, string> = {
           en_stock: 'En stock',
           stock_faible: 'Stock faible',
           rupture: 'En rupture'
         };
-        const tones: { [k: string]: 'green' | 'orange' | 'red' } = {
+        const tones: Record<string, 'green' | 'orange' | 'red'> = {
           en_stock: 'green',
           stock_faible: 'orange',
           rupture: 'red'
         };
-        return <StatusBadge label={labels[p.statut_stock]} tone={tones[p.statut_stock]} />;
+        return <StatusBadge label={labels[p.statut_stock] || p.statut_stock} tone={tones[p.statut_stock] || 'green'} />;
       }
     },
     {
@@ -254,7 +252,7 @@ export const ProduitsPage: React.FC = () => {
         <div>
           <h2 className="text-xl font-bold text-[#212121]">Catalogue & Fiches Articles</h2>
           <p className="text-xs text-neutral-500 mt-0.5">
-            Contrôle des prix, conditionnements et seuils d'alertes automatiques
+            Gestion des articles, prix de vente et seuils d'alertes automatiques
           </p>
         </div>
 
@@ -318,7 +316,7 @@ export const ProduitsPage: React.FC = () => {
         isOpen={modalOpen}
         onClose={() => !saving && setModalOpen(false)}
         title={editingProduit ? 'Modifier la fiche produit' : 'Créer un nouveau produit'}
-        subtitle="Règles métier validées par contraintes et triggers PostgreSQL"
+        subtitle="Gestion des caractéristiques, tarifs et seuils de réapprovisionnement"
         footer={
           <>
             <button
@@ -373,7 +371,6 @@ export const ProduitsPage: React.FC = () => {
             onChange={(e) => setFormData({ ...formData, nom: e.target.value })}
           />
 
-          {/* Prix d'achat et Prix de vente avec contrôle d'interdiction strict du négatif */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <FormField
               id="p-prix-vente"
@@ -385,7 +382,6 @@ export const ProduitsPage: React.FC = () => {
               value={formData.prix_vente}
               onChange={(e) => handlePriceChange('prix_vente', e.target.value)}
               error={formErrors.prix_vente}
-              helpText="Ne peut pas être négatif (CHECK prix >= 0)"
             />
 
             <FormField
@@ -398,7 +394,6 @@ export const ProduitsPage: React.FC = () => {
               value={formData.prix_achat}
               onChange={(e) => handlePriceChange('prix_achat', e.target.value)}
               error={formErrors.prix_achat}
-              helpText="Coût d'acquisition unitaire"
             />
           </div>
 
@@ -413,7 +408,6 @@ export const ProduitsPage: React.FC = () => {
               onChange={(e) =>
                 setFormData({ ...formData, seuil_alerte: parseInt(e.target.value, 10) || 0 })
               }
-              helpText="Déclenche le statut orange"
             />
 
             <FormField

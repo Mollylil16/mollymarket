@@ -213,7 +213,7 @@ export const EmployesPage: React.FC = () => {
         isOpen={modalOpen}
         onClose={() => !saving && setModalOpen(false)}
         title={editingEmploye ? 'Modifier le collaborateur' : 'Créer un compte employé'}
-        subtitle="Mise à jour directe de la table PostgreSQL des utilisateurs et rôles"
+        subtitle="Gestion des informations du collaborateur, matricule et habilitations"
         footer={
           <>
             <button

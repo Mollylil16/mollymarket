@@ -37,7 +37,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, featur
         <h3 className="text-lg font-bold text-[#212121]">Accès Restreint</h3>
         <p className="text-xs text-neutral-500 mt-1 max-w-sm">
           Votre profil actuel ({role}) ne dispose pas des privilèges nécessaires pour accéder à ce
-          module selon les règles de sécurité PostgreSQL.
+          module selon vos habilitations professionnelles.
         </p>
         <Link
           to={role === 'Vendeur' ? '/ventes' : role === 'Magasinier' ? '/stocks' : '/dashboard'}

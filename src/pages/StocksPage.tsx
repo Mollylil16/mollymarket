@@ -75,7 +75,7 @@ export const StocksPage: React.FC = () => {
     }
 
     if (!motifAjustement.trim()) {
-      toastError('Veuillez renseigner un motif pour l\'audit trail PostgreSQL.');
+      toastError('Veuillez renseigner un motif pour la traçabilité de l\'ajustement.');
       return;
     }
 
@@ -87,7 +87,7 @@ export const StocksPage: React.FC = () => {
         motifAjustement,
         user ? `${user.prenom} ${user.nom}` : 'Magasinier'
       );
-      toastSuccess('Ajustement de stock enregistré', 'CALL sp_ajustement_stock');
+      toastSuccess('Ajustement de stock enregistré avec succès', 'Mise à jour du stock et journal d\'audit');
       setModalAjustementOpen(false);
       loadData();
     } catch (err: any) {

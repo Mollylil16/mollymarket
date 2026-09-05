@@ -45,14 +45,14 @@ export const AchatsPage: React.FC = () => {
   const [factureRef, setFactureRef] = useState<string>('');
   const [lignesAchat, setLignesAchat] = useState<
     { produit_id: number; quantite: number; prix_unitaire: number }[]
-  >([{ produit_id: 1, quantite: 50, prix_unitaire: 1.60 }]);
+  >([]);
 
-  // Totaux retournés par le backend (aucune formule en dur dans le client)
+  // Totaux retournés par le backend
   const [calculBackend, setCalculBackend] = useState<{
     montant_ht: number;
     tva: number;
     montant_total: number;
-  }>({ montant_ht: 80, tva: 20, montant_total: 100 });
+  }>({ montant_ht: 0, tva: 0, montant_total: 0 });
 
   const { user } = useAuth();
   const { toastSuccess, toastError } = useToast();
@@ -69,6 +69,20 @@ export const AchatsPage: React.FC = () => {
       setFournisseurs(frsData);
       setProduits(prodsData);
       if (frsData.length > 0) setFournisseurId(frsData[0].id);
+
+      // Initialiser avec le premier produit disponible et son prix d'achat réel
+      if (prodsData.length > 0) {
+        setLignesAchat((prev) => {
+          if (prev.length === 0) {
+            return [{
+              produit_id: prodsData[0].id,
+              quantite: 10,
+              prix_unitaire: Number(prodsData[0].prix_achat) || 1500
+            }];
+          }
+          return prev;
+        });
+      }
     } catch (err: any) {
       toastError(err.message || 'Erreur chargement des achats');
     } finally {
@@ -96,6 +110,8 @@ export const AchatsPage: React.FC = () => {
     };
     if (lignesAchat.length > 0) {
       fetchCalculation();
+    } else {
+      setCalculBackend({ montant_ht: 0, tva: 0, montant_total: 0 });
     }
   }, [lignesAchat]);
 
@@ -106,7 +122,7 @@ export const AchatsPage: React.FC = () => {
       {
         produit_id: firstProd ? firstProd.id : 1,
         quantite: 10,
-        prix_unitaire: firstProd ? firstProd.prix_achat : 1.0
+        prix_unitaire: firstProd ? Number(firstProd.prix_achat) || 1500 : 1500
       }
     ]);
   };
@@ -122,7 +138,7 @@ export const AchatsPage: React.FC = () => {
       copy[index] = {
         ...copy[index],
         produit_id: pId,
-        prix_unitaire: prod ? prod.prix_achat : 1.0
+        prix_unitaire: prod ? Number(prod.prix_achat) || 1500 : 1500
       };
       return copy;
     });
@@ -206,8 +222,8 @@ export const AchatsPage: React.FC = () => {
         user ? `${user.prenom} ${user.nom}` : 'Karim Benali (Magasinier)'
       );
       toastSuccess(
-        `Marchandises réceptionnées ! Les stocks de ${achat.lignes.length} article(s) ont été incrémentés.`,
-        'CALL sp_reception_stock'
+        `Marchandises réceptionnées ! Les stocks de ${achat.lignes.length} article(s) ont été mis à jour.`,
+        'Entrée en stock effectuée & PUMP actualisé'
       );
       loadData();
     } catch (err: any) {
@@ -410,9 +426,9 @@ export const AchatsPage: React.FC = () => {
 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-[#212121]">Achats Fournisseurs & Facturation</h2>
+          <h2 className="text-xl font-bold text-[#212121]">Achats Fournisseurs & Approvisionnement</h2>
           <p className="text-xs text-neutral-500 mt-0.5">
-            Commandes Magasinier, règlement des factures par le Directeur et réception des stocks
+            Commandes Magasinier, ordonnancement des paiements par la Direction et réceptions de marchandises
           </p>
         </div>
 
@@ -437,8 +453,8 @@ export const AchatsPage: React.FC = () => {
       <Modal
         isOpen={modalNewOpen}
         onClose={() => !submitting && setModalNewOpen(false)}
-        title="Effectuer un Achat Fournisseur"
-        subtitle="Procédure stockée : CALL sp_effectuer_achat(fournisseur_id, lignes_json, utilisateur_id)"
+        title="Nouvelle Commande d'Approvisionnement"
+        subtitle="Établissement du bon de commande fournisseur & transmission au Directeur"
         size="lg"
         footer={
           <>
@@ -454,9 +470,10 @@ export const AchatsPage: React.FC = () => {
               type="submit"
               form="achat-form"
               disabled={submitting || lignesAchat.length === 0}
-              className="px-4 py-2 text-xs font-bold text-white bg-[#2E7D32] hover:bg-[#1B5E20] rounded-lg shadow-xs transition-colors disabled:opacity-50"
+              className="px-4 py-2 text-xs font-bold text-white bg-[#2E7D32] hover:bg-[#1B5E20] rounded-lg shadow-xs transition-colors disabled:opacity-50 flex items-center gap-1.5"
             >
-              {submitting ? 'Validation...' : 'Valider la commande d\'achat'}
+              <Truck className="w-4 h-4" />
+              <span>{submitting ? 'Transmission en cours...' : 'Valider et transmettre la commande'}</span>
             </button>
           </>
         }
@@ -465,7 +482,7 @@ export const AchatsPage: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <FormField
               id="achat-frs"
-              label="Sélectionner le Fournisseur"
+              label="Sélectionner le Fournisseur Partenaire"
               type="select"
               required
               value={fournisseurId}
@@ -478,98 +495,126 @@ export const AchatsPage: React.FC = () => {
 
             <FormField
               id="achat-facture-ref"
-              label="N° Facture Fournisseur (Proforma)"
+              label="N° Devis / Facture Proforma Fournisseur"
               type="text"
-              placeholder="Ex: FAC-2026-0089"
+              placeholder="Ex: PRO-2026-0089 ou DEVIS-SIPRA-44"
               value={factureRef}
               onChange={(e) => setFactureRef(e.target.value)}
-              helperText="La facture sera transmise au Directeur pour ordonnancement du paiement"
+              helperText="La commande sera transmise au Directeur pour validation et ordonnancement du paiement"
             />
           </div>
 
           <div className="border-t border-neutral-100 pt-3">
             <div className="flex items-center justify-between mb-2">
-              <label className="text-xs font-bold text-neutral-700">
+              <label className="text-xs font-bold text-neutral-800">
                 Articles & Quantités à commander
               </label>
               <button
                 type="button"
                 onClick={handleAddLine}
-                className="text-xs font-bold text-[#2E7D32] hover:underline flex items-center gap-1"
+                className="text-xs font-bold text-[#2E7D32] hover:underline flex items-center gap-1 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200"
               >
                 <Plus className="w-3.5 h-3.5" />
-                Ajouter une ligne
+                Ajouter un article
               </button>
             </div>
 
-            <div className="space-y-2.5 max-h-60 overflow-y-auto pr-1">
-              {lignesAchat.map((ligne, index) => (
-                <div
-                  key={index}
-                  className="flex items-center gap-2 p-2 rounded-xl bg-neutral-50 border border-neutral-200 text-xs"
-                >
-                  <div className="flex-1">
-                    <select
-                      value={ligne.produit_id}
-                      onChange={(e) => handleLineProductChange(index, parseInt(e.target.value, 10))}
-                      className="w-full bg-white border border-neutral-300 rounded-lg p-1.5 text-xs font-medium focus:outline-none focus:border-[#2E7D32]"
-                    >
-                      {produits.map((p) => (
-                        <option key={p.id} value={p.id}>
-                          {p.nom} (Reste: {p.stock_actuel})
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+            {/* En-tête des colonnes du tableau des lignes */}
+            <div className="grid grid-cols-12 gap-2 px-2 py-1 text-[11px] font-bold text-neutral-500 uppercase tracking-wider bg-neutral-100/70 rounded-lg mb-1.5">
+              <div className="col-span-5">Article & Stock Actuel</div>
+              <div className="col-span-2 text-center">Quantité</div>
+              <div className="col-span-2 text-right">Prix Unit. (FCFA)</div>
+              <div className="col-span-2 text-right">Sous-total</div>
+              <div className="col-span-1 text-center"></div>
+            </div>
 
-                  <div className="w-24">
-                    <input
-                      type="number"
-                      min="1"
-                      placeholder="Qté"
-                      value={ligne.quantite}
-                      onChange={(e) => handleLineQtyChange(index, parseInt(e.target.value, 10))}
-                      className="w-full bg-white border border-neutral-300 rounded-lg p-1.5 text-xs text-center font-bold focus:outline-none focus:border-[#2E7D32]"
-                    />
-                  </div>
+            <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
+              {lignesAchat.map((ligne, index) => {
+                const prod = produits.find((p) => p.id === ligne.produit_id);
+                const ligneTotal = Number(ligne.quantite || 0) * Number(ligne.prix_unitaire || 0);
 
-                  <div className="w-28">
-                    <input
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      placeholder="Prix U"
-                      value={ligne.prix_unitaire}
-                      onChange={(e) => handleLinePriceChange(index, parseFloat(e.target.value))}
-                      className="w-full bg-white border border-neutral-300 rounded-lg p-1.5 text-xs text-right font-medium focus:outline-none focus:border-[#2E7D32]"
-                    />
-                  </div>
+                return (
+                  <div
+                    key={index}
+                    className="grid grid-cols-12 gap-2 items-center p-2 rounded-xl bg-neutral-50 border border-neutral-200 text-xs hover:border-neutral-300 transition-all"
+                  >
+                    <div className="col-span-5">
+                      <select
+                        value={ligne.produit_id}
+                        onChange={(e) => handleLineProductChange(index, parseInt(e.target.value, 10))}
+                        className="w-full bg-white border border-neutral-300 rounded-lg p-1.5 text-xs font-medium focus:outline-none focus:border-[#2E7D32]"
+                      >
+                        {produits.map((p) => (
+                          <option key={p.id} value={p.id}>
+                            {p.nom} (Stock: {p.stock_actuel})
+                          </option>
+                        ))}
+                      </select>
+                    </div>
 
-                  {lignesAchat.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveLine(index)}
-                      className="p-1 text-neutral-400 hover:text-[#E53935]"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  )}
-                </div>
-              ))}
+                    <div className="col-span-2">
+                      <input
+                        type="number"
+                        min="1"
+                        placeholder="Qté"
+                        value={ligne.quantite}
+                        onChange={(e) => handleLineQtyChange(index, parseInt(e.target.value, 10))}
+                        className="w-full bg-white border border-neutral-300 rounded-lg p-1.5 text-xs text-center font-bold focus:outline-none focus:border-[#2E7D32]"
+                      />
+                    </div>
+
+                    <div className="col-span-2">
+                      <input
+                        type="number"
+                        min="0"
+                        step="50"
+                        placeholder="Prix Achat"
+                        value={ligne.prix_unitaire}
+                        onChange={(e) => handleLinePriceChange(index, parseFloat(e.target.value) || 0)}
+                        className="w-full bg-white border border-neutral-300 rounded-lg p-1.5 text-xs text-right font-medium focus:outline-none focus:border-[#2E7D32]"
+                      />
+                    </div>
+
+                    <div className="col-span-2 text-right font-bold text-neutral-800 font-mono">
+                      {formatFCFA(ligneTotal)}
+                    </div>
+
+                    <div className="col-span-1 text-center">
+                      {lignesAchat.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveLine(index)}
+                          className="p-1 text-neutral-400 hover:text-[#E53935] rounded-md transition-colors"
+                          title="Supprimer cette ligne"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
 
-          {/* Récapitulatif calculé par la fonction PostgreSQL */}
-          <div className="p-3.5 rounded-xl bg-neutral-100/80 border border-neutral-200 flex items-center justify-between text-xs">
-            <span className="text-neutral-500 font-medium">
-              Total retourné par la fonction PostgreSQL :
-            </span>
-            <div className="text-right">
-              <span className="text-base font-black text-[#212121]">
-                {formatFCFA(calculBackend.montant_total)} TTC
-              </span>
-              <div className="text-[10px] text-neutral-400">
-                (dont TVA : {formatFCFA(calculBackend.tva)})
+          {/* Récapitulatif Financier Professionnel */}
+          <div className="p-3.5 rounded-xl bg-emerald-50/60 border border-emerald-200 text-xs">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+              <div className="space-y-0.5">
+                <div className="font-bold text-neutral-800 flex items-center gap-1.5">
+                  <CheckCircle2 className="w-4 h-4 text-[#2E7D32]" />
+                  <span>Récapitulatif Financier de la Commande</span>
+                </div>
+                <div className="text-[11px] text-neutral-500">
+                  Total HT : {formatFCFA(calculBackend.montant_ht)} • TVA estimée : {formatFCFA(calculBackend.tva)}
+                </div>
+              </div>
+
+              <div className="text-right sm:border-l sm:border-emerald-200 sm:pl-4">
+                <div className="text-[10px] uppercase font-bold text-neutral-400">Total Net à Régler</div>
+                <div className="text-lg font-black text-[#2E7D32] font-mono">
+                  {formatFCFA(calculBackend.montant_total)} TTC
+                </div>
               </div>
             </div>
           </div>

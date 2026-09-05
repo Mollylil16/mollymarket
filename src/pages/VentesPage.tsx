@@ -374,7 +374,7 @@ export const VentesPage: React.FC = () => {
         isOpen={modalNewOpen}
         onClose={() => !submitting && setModalNewOpen(false)}
         title="Encaisser une Vente (Caisse)"
-        subtitle="CALL sp_effectuer_vente • Calcul automatique du total par fonction PostgreSQL"
+        subtitle="Saisie des articles, calcul certifié et déstockage automatique"
         size="lg"
         footer={
           <>
@@ -609,13 +609,14 @@ export const VentesPage: React.FC = () => {
         </Modal>
       )}
 
-      {/* Modal Confirmation Annulation */}
+      {/* Modal Annulation Vente */}
       {selectedVente && (
         <Modal
           isOpen={modalAnnulerOpen}
           onClose={() => !submitting && setModalAnnulerOpen(false)}
-          title={`Annuler la Vente #${selectedVente.numero_ticket}`}
-          subtitle="Procédure stockée : CALL sp_annuler_vente(vente_id, motif, utilisateur_id)"
+          title={`Annuler la Vente ${selectedVente.numero_vente}`}
+          subtitle="Procédure d'annulation administrative et réintégration des stocks"
+          size="md"
           footer={
             <>
               <button
@@ -627,12 +628,12 @@ export const VentesPage: React.FC = () => {
                 Retour
               </button>
               <button
-                type="button"
+                type="submit"
+                form="annuler-form"
                 disabled={submitting || !motifAnnulation.trim()}
-                onClick={handleAnnulerVente}
-                className="px-4 py-2 text-xs font-bold text-white bg-[#E53935] hover:bg-red-700 rounded-lg shadow-xs transition-colors disabled:opacity-50"
+                className="px-4 py-2 text-xs font-bold text-white bg-[#E53935] hover:bg-red-700 rounded-lg shadow-xs disabled:opacity-50"
               >
-                {submitting ? 'Traitement...' : 'Confirmer l\'annulation'}
+                {submitting ? 'Annulation...' : 'Confirmer l\'annulation'}
               </button>
             </>
           }
@@ -641,10 +642,9 @@ export const VentesPage: React.FC = () => {
             <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl flex items-start gap-2.5 text-xs text-rose-950">
               <AlertCircle className="w-5 h-5 text-[#E53935] shrink-0 mt-0.5" />
               <div>
-                <p className="font-bold">Attention :</p>
+                <p className="font-bold">Information importante :</p>
                 <p className="mt-0.5">
-                  L'exécution de la procédure PostgreSQL <code>sp_annuler_vente</code> réintégrera
-                  automatiquement tous les articles vendus dans les stocks disponibles via son trigger.
+                  L'annulation réintégrera automatiquement tous les articles vendus dans les stocks disponibles et archivera l'opération dans le journal d'audit.
                 </p>
               </div>
             </div>

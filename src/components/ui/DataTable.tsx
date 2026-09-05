@@ -146,7 +146,7 @@ export function DataTable<T extends Record<string, any>>({
           <div className="absolute inset-0 bg-white/70 backdrop-blur-[1px] flex flex-col items-center justify-center z-10">
             <Loader2 className="w-7 h-7 text-[#2E7D32] animate-spin mb-2" />
             <span className="text-xs font-medium text-neutral-600">
-              Interrogation des vues PostgreSQL...
+              Chargement des données en cours...
             </span>
           </div>
         )}

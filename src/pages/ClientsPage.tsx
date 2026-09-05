@@ -226,7 +226,7 @@ export const ClientsPage: React.FC = () => {
         isLoading={loading}
         searchPlaceholder="Rechercher par nom, prénom, email, téléphone..."
         searchKeys={['nom', 'prenom', 'telephone', 'email', 'code_client']}
-        emptyMessage="Aucun client enregistré dans la base PostgreSQL"
+        emptyMessage="Aucun client enregistré"
       />
 
       {/* Modal Ajout / Modification */}
@@ -236,8 +236,8 @@ export const ClientsPage: React.FC = () => {
         title={editingClient ? 'Modifier la fiche client' : 'Ajouter un nouveau client'}
         subtitle={
           editingClient
-            ? `Procédure PostgreSQL : CALL sp_modifier_client(${editingClient.code_client})`
-            : 'Procédure PostgreSQL : CALL sp_ajouter_client(...)'
+            ? `Modification des coordonnées du client ${editingClient.code_client}`
+            : 'Enregistrement d\'un nouveau compte client et programme fidélité'
         }
         footer={
           <>
