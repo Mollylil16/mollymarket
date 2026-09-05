@@ -37,7 +37,7 @@ export const AchatsPage: React.FC = () => {
   const [modalPayerOpen, setModalPayerOpen] = useState(false);
   const [selectedAchat, setSelectedAchat] = useState<Achat | null>(null);
   const [achatAPayer, setAchatAPayer] = useState<Achat | null>(null);
-  const [modePaiementDirecteur, setModePaiementDirecteur] = useState<string>('virement');
+  const [modePaiementDirecteur, setModePaiementDirecteur] = useState<string>('especes');
   const [submitting, setSubmitting] = useState(false);
 
   // New Purchase Form
@@ -735,11 +735,11 @@ export const AchatsPage: React.FC = () => {
               value={modePaiementDirecteur}
               onChange={(e) => setModePaiementDirecteur(e.target.value)}
               options={[
+                { value: 'especes', label: 'Espèces (Sortie Immédiate Fond de Caisse)' },
                 { value: 'virement', label: 'Virement bancaire professionnel' },
-                { value: 'cheque', label: 'Chèque certifié d\'entreprise' },
-                { value: 'especes', label: 'Espèces (Sortie Fond de Caisse)' }
+                { value: 'cheque', label: 'Chèque certifié d\'entreprise' }
               ]}
-              helperText="Cette opération déduira automatiquement le montant de la trésorerie générale du supermarché."
+              helperText="Si payé en espèces, une sortie de caisse est automatiquement enregistrée et déduite du solde de caisse."
             />
 
             <div className="p-3 bg-neutral-50 rounded-xl border border-neutral-200 text-neutral-600 space-y-1 text-[11px]">

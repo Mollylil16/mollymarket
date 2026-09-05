@@ -487,8 +487,12 @@ app.post('/api/achats/:id/reception', async (req, res) => {
 
 app.post('/api/achats/:id/payer', async (req, res) => {
   try {
-    const { paye_par_id } = req.body;
-    await pool.query('CALL payer_facture_fournisseur($1, $2)', [parseInt(req.params.id), paye_par_id]);
+    const { paye_par_id, mode_paiement } = req.body;
+    await pool.query('CALL payer_facture_fournisseur($1, $2, $3)', [
+      parseInt(req.params.id, 10),
+      paye_par_id || 2,
+      mode_paiement || 'especes'
+    ]);
     const achatResult = await pool.query('SELECT * FROM vue_achats WHERE id = $1', [req.params.id]);
     res.json(achatResult.rows[0]);
   } catch (err) {

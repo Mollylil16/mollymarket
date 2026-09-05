@@ -316,10 +316,13 @@ export const apiClient = {
     return achats.find(a => a.id === achatId) as Achat;
   },
 
-  async payerFactureFournisseur(achatId: number, _payeParNom: string, _modePaiement: string = 'virement', payeParId?: number): Promise<Achat> {
+  async payerFactureFournisseur(achatId: number, _payeParNom: string, modePaiement: string = 'especes', payeParId?: number): Promise<Achat> {
     return apiFetch<Achat>(`/api/achats/${achatId}/payer`, {
       method: 'POST',
-      body: JSON.stringify({ paye_par_id: payeParId || 2 }),
+      body: JSON.stringify({
+        paye_par_id: payeParId || 2,
+        mode_paiement: modePaiement
+      }),
     });
   },
 
