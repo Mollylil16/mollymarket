@@ -40,7 +40,16 @@ export const GestionTresorerieCaisse: React.FC = () => {
     totalEntrees: number;
     totalSorties: number;
     fondInitial: number;
-  }>({ soldeActuel: 50000, totalEntrees: 0, totalSorties: 0, fondInitial: 50000 });
+    totalVentesEspeces: number;
+    totalEntreesManuelles: number;
+  }>({
+    soldeActuel: 50000,
+    totalEntrees: 0,
+    totalSorties: 0,
+    fondInitial: 50000,
+    totalVentesEspeces: 0,
+    totalEntreesManuelles: 0
+  });
 
   const [loading, setLoading] = useState(true);
   const [filtreType, setFiltreType] = useState<string>('tous');
@@ -142,8 +151,13 @@ export const GestionTresorerieCaisse: React.FC = () => {
   });
 
   const exporterJournalExcel = () => {
-    const csvRows: string[] = [];
-    csvRows.push(['Date & Heure', 'Type', 'Sens', 'Montant (FCFA)', 'Solde Après (FCFA)', 'Motif', 'Justificatif', 'Ordonnateur'].join(';'));
+    if (mouvements.length === 0) {
+      toastWarning('Aucun mouvement à exporter dans le journal.');
+      return;
+    }
+
+    const headers = ['Date & Heure', 'Type Mouvement', 'Sens', 'Montant (FCFA)', 'Solde Après (FCFA)', 'Motif', 'Justificatif', 'Ordonnateur'];
+    const csvRows = [headers.join(';')];
     
     mouvements.forEach((m) => {
       csvRows.push([
@@ -179,8 +193,8 @@ export const GestionTresorerieCaisse: React.FC = () => {
             <div className="text-2xl font-black text-[#2E7D32] font-mono mt-1">
               {formatFCFA(soldeInfo.soldeActuel)}
             </div>
-            <p className="text-[11px] text-neutral-400 mt-1">
-              Fonds physiquement disponibles en caisse centrale
+            <p className="text-[11px] text-neutral-500 mt-1">
+              Fond initial ({formatFCFA(soldeInfo.fondInitial)}) + Recettes nettes
             </p>
           </div>
           <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-[#2E7D32] flex items-center justify-center shrink-0">
@@ -192,13 +206,13 @@ export const GestionTresorerieCaisse: React.FC = () => {
         <div className="bg-white border border-neutral-200 rounded-2xl p-5 shadow-xs flex items-center justify-between">
           <div>
             <div className="text-xs font-bold text-neutral-500 uppercase tracking-wider">
-              Total Entrées & Apports
+              Total Entrées & Recettes
             </div>
             <div className="text-2xl font-black text-blue-700 font-mono mt-1">
               {formatFCFA(soldeInfo.totalEntrees)}
             </div>
-            <p className="text-[11px] text-neutral-400 mt-1">
-              Apports, recettes et encaissements enregistrés
+            <p className="text-[11px] text-neutral-500 mt-1">
+              Ventes espèces ({formatFCFA(soldeInfo.totalVentesEspeces || 0)}) + Apports
             </p>
           </div>
           <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
@@ -215,8 +229,8 @@ export const GestionTresorerieCaisse: React.FC = () => {
             <div className="text-2xl font-black text-amber-700 font-mono mt-1">
               {formatFCFA(soldeInfo.totalSorties)}
             </div>
-            <p className="text-[11px] text-neutral-400 mt-1">
-              Achats fournisseurs, frais et retraits banque
+            <p className="text-[11px] text-neutral-500 mt-1">
+              Achats fournisseurs, frais et sorties espèces
             </p>
           </div>
           <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">

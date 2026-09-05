@@ -674,14 +674,44 @@ app.post('/api/caisse/mouvements', async (req, res) => {
 
 app.get('/api/caisse/solde', async (req, res) => {
   try {
-    const result = await pool.query(`
+    // 1. Fond initial de la session active ou dernière session
+    const sessionRes = await pool.query(`
+      SELECT COALESCE(fond_caisse_initial, 50000) AS fond_initial
+      FROM points_caisse
+      ORDER BY date_journee DESC LIMIT 1
+    `);
+    const fondInitial = sessionRes.rows.length > 0 ? Number(sessionRes.rows[0].fond_initial) : 50000;
+
+    // 2. Ventes en espèces encaissées
+    const ventesEspecesRes = await pool.query(`
+      SELECT COALESCE(SUM(montant), 0) AS total_especes
+      FROM paiements
+      WHERE mode_paiement = 'especes'
+    `);
+    const totalVentesEspeces = Number(ventesEspecesRes.rows[0]?.total_especes || 0);
+
+    // 3. Mouvements de caisse manuels (Apports de fonds & Décaissements)
+    const mouvsRes = await pool.query(`
       SELECT 
-        COALESCE((SELECT solde_apres FROM mouvements_caisse ORDER BY date_mouvement DESC LIMIT 1), 50000) AS solde_actuel,
-        COALESCE(SUM(montant) FILTER (WHERE sens = 'entree'), 0) AS total_entrees,
-        COALESCE(SUM(montant) FILTER (WHERE sens = 'sortie'), 0) AS total_sorties
+        COALESCE(SUM(montant) FILTER (WHERE sens = 'entree'), 0) AS total_entrees_manuelles,
+        COALESCE(SUM(montant) FILTER (WHERE sens = 'sortie'), 0) AS total_sorties_manuelles
       FROM mouvements_caisse
     `);
-    res.json({ ...result.rows[0], fondInitial: 50000 });
+    const totalEntreesManuelles = Number(mouvsRes.rows[0]?.total_entrees_manuelles || 0);
+    const totalSortiesManuelles = Number(mouvsRes.rows[0]?.total_sorties_manuelles || 0);
+
+    const totalEntrees = totalVentesEspeces + totalEntreesManuelles;
+    const totalSorties = totalSortiesManuelles;
+    const soldeActuel = fondInitial + totalEntrees - totalSorties;
+
+    res.json({
+      solde_actuel: soldeActuel,
+      total_entrees: totalEntrees,
+      total_sorties: totalSorties,
+      fond_initial: fondInitial,
+      total_ventes_especes: totalVentesEspeces,
+      total_entrees_manuelles: totalEntreesManuelles
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

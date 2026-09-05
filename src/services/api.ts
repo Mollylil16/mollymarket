@@ -503,14 +503,21 @@ export const apiClient = {
   },
 
   async getSoldeCaisseActuel(): Promise<{
-    soldeActuel: number; totalEntrees: number; totalSorties: number; fondInitial: number;
+    soldeActuel: number;
+    totalEntrees: number;
+    totalSorties: number;
+    fondInitial: number;
+    totalVentesEspeces: number;
+    totalEntreesManuelles: number;
   }> {
     const data = await apiFetch<any>('/api/caisse/solde');
     return {
-      soldeActuel: Number(data.solde_actuel),
-      totalEntrees: Number(data.total_entrees),
-      totalSorties: Number(data.total_sorties),
-      fondInitial: Number(data.fondinitial || 50000),
+      soldeActuel: Number(data.solde_actuel || 0),
+      totalEntrees: Number(data.total_entrees || 0),
+      totalSorties: Number(data.total_sorties || 0),
+      fondInitial: Number(data.fond_initial || 50000),
+      totalVentesEspeces: Number(data.total_ventes_especes || 0),
+      totalEntreesManuelles: Number(data.total_entrees_manuelles || 0),
     };
   }
 };
