@@ -1,0 +1,19 @@
+-- ============================================================================
+-- PROJET MOLLY MARKET - SCRIPT COMPLET D'INITIALISATION
+-- Base de données : mollymarket_backend
+-- Utilisateur : mollymarket_user
+--
+-- ORDRE D'EXÉCUTION DANS PGADMIN (Query Tool) :
+-- Vous pouvez soit exécuter ce guide fichier par fichier (recommandé),
+-- soit exécuter les scripts dans l'ordre suivant :
+--
+-- 1. sql/01_tables.sql                --> Schéma relationnel (11 tables + ENUMs)
+-- 2. sql/02_roles_privileges.sql        --> Sécurité RBAC (4 rôles + RLS)
+-- 3. sql/03_vues.sql                   --> Vues statistiques & reporting (7 vues)
+-- 4. sql/04_fonctions.sql              --> Fonctions PL/pgSQL (calculs, stats, caisse)
+-- 5. sql/05_procedures.sql             --> Procédures de transaction (ventes, achats, réappros)
+-- 6. sql/06_triggers.sql               --> Déclencheurs automatiques (stock, alertes, audits)
+-- 7. sql/07_cte.sql                    --> Requêtes analytiques avancées (CTE & fenêtrage)
+-- 8. sql/08_seed_data.sql              --> Données initiales (130+ produits, clients, caisse)
+-- 9. sql/09_sauvegarde_restauration.sql --> Guide backup pg_dump & pg_restore
+-- ============================================================================

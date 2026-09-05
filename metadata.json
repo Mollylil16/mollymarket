@@ -1,0 +1,6 @@
+{
+  "name": "Molly Market",
+  "description": "Application web de gestion commerciale et caisse pour le supermarché Molly Market à Abidjan (Côte d'Ivoire) en FCFA.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
